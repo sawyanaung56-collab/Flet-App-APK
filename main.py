@@ -185,7 +185,8 @@ def main(page: ft.Page):
                 open_chat_with_teacher(page.admin_selected_chat_tutor_id)
                 refresh_teacher_chat_view()
 
-    chat_image_picker = ft.FilePicker(on_result=on_chat_image_selected)
+    chat_image_picker = ft.FilePicker()
+    chat_image_picker.on_result = on_chat_image_selected
     page.overlay.append(chat_image_picker)
 
     def select_and_send_image(sender_type):
@@ -216,7 +217,8 @@ def main(page: ft.Page):
             profile_img_preview.visible = True
             page.update()
 
-    profile_photo_picker = ft.FilePicker(on_result=on_profile_photo_selected)
+    profile_photo_picker = ft.FilePicker()
+    profile_photo_picker.on_result = on_profile_photo_selected
     page.overlay.append(profile_photo_picker)
 
     def pick_profile_photo(e):
