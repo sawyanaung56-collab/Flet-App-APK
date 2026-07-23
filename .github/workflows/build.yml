@@ -25,11 +25,18 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.16.9'
+
       - name: Install Libraries
         run: pip install -r requirements.txt
 
       - name: Build APK
-        run: echo "y" | flet build apk --project teacher_match --product "Teacher Match" --org com.agency.teachermatch
+        run: flet build apk --project teacher_match --product "Teacher Match" --org com.agency.teachermatch
+
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
