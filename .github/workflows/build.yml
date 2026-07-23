@@ -31,11 +31,16 @@ jobs:
           channel: 'stable'
           flutter-version: '3.16.9'
 
+      - name: Accept Android Licenses
+        run: |
+          flutter config --no-analytics
+          yes | flutter doctor --android-licenses || true
+
       - name: Install Libraries
         run: pip install -r requirements.txt
 
       - name: Build APK
-        run: flet build apk --project teacher_match --product "Teacher Match" --org com.agency.teachermatch
+        run: echo "y" | flet build apk --project teacher_match --product "Teacher Match" --org com.agency.teachermatch
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
