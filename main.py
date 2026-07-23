@@ -1,8 +1,6 @@
 import flet as ft
 from supabase import create_client, Client
 import re
-import tkinter as tk
-from tkinter import filedialog
 
 # =========================================================================
 # --- SUPABASE DATABASE CONNECTION ---
@@ -161,18 +159,12 @@ def main(page: ft.Page):
         ft.dropdown.Option("အခြား")
     ]
 
-    def select_and_send_image(sender_type):
-        root = tk.Tk()
-        root.attributes('-topmost', True) 
-        root.withdraw() 
-        
-        file_path = filedialog.askopenfilename(
-            title="ဓာတ်ပုံရွေးချယ်ပါ", 
-            filetypes=[("Image Files", "*.png;*.jpg;*.jpeg")]
-        )
-        root.destroy()
-        
-        if file_path:
+    current_chat_sender = [None]
+
+    def on_chat_image_selected(e: ft.FilePickerResultEvent):
+        if e.files and len(e.files) > 0:
+            file_path = e.files[0].path
+            sender_type = current_chat_sender[0]
             if sender_type == "teacher" and page.logged_in_tutor_id:
                 supabase.table("chat_messages").insert({
                     "tutor_id": page.logged_in_tutor_id,
@@ -193,6 +185,13 @@ def main(page: ft.Page):
                 open_chat_with_teacher(page.admin_selected_chat_tutor_id)
                 refresh_teacher_chat_view()
 
+    chat_image_picker = ft.FilePicker(on_result=on_chat_image_selected)
+    page.overlay.append(chat_image_picker)
+
+    def select_and_send_image(sender_type):
+        current_chat_sender[0] = sender_type
+        chat_image_picker.pick_files(allow_multiple=False, allowed_extensions=["png", "jpg", "jpeg"])
+
     # =========================================================================
     # --- ၁။ TEACHER TAB ---
     # =========================================================================
@@ -209,20 +208,19 @@ def main(page: ft.Page):
     photo_input = ft.TextField(label="ဓာတ်ပုံ လမ်းကြောင်း", disabled=True, expand=True)
     select_photo_btn = ft.ElevatedButton("📷 ဓာတ်ပုံ ရွေးပါ", disabled=True)
 
-    def pick_profile_photo(e):
-        root = tk.Tk()
-        root.attributes('-topmost', True)
-        root.withdraw()
-        file_path = filedialog.askopenfilename(
-            title="Profile ဓာတ်ပုံရွေးပါ",
-            filetypes=[("Image Files", "*.png;*.jpg;*.jpeg")]
-        )
-        root.destroy()
-        if file_path:
+    def on_profile_photo_selected(e: ft.FilePickerResultEvent):
+        if e.files and len(e.files) > 0:
+            file_path = e.files[0].path
             photo_input.value = file_path
             profile_img_preview.src = file_path
             profile_img_preview.visible = True
             page.update()
+
+    profile_photo_picker = ft.FilePicker(on_result=on_profile_photo_selected)
+    page.overlay.append(profile_photo_picker)
+
+    def pick_profile_photo(e):
+        profile_photo_picker.pick_files(allow_multiple=False, allowed_extensions=["png", "jpg", "jpeg"])
 
     select_photo_btn.on_click = pick_profile_photo
     
