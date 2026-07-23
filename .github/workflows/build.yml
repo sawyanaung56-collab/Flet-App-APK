@@ -8,9 +8,21 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
+      # ၁။ စက်ပေါ်ရှိ မလိုအပ်သော အရာများကို ဖျက်ထုတ်ပြီး နေရာလွတ် ရှင်းလင်းခြင်း (Memory & Disk ရှင်းလင်းရန်)
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: false # Android SDK ကိုတော့ App ထုတ်ရန် လိုအပ်သဖြင့် မဖျက်ပါ
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
@@ -40,11 +52,10 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Build APK
-        # CI=true နှင့် Gradle Daemon ကို ပိတ်ခြင်းဖြင့် Hang ဖြစ်ခြင်းကို တားဆီးပါမည်
+        # PIP ကို တိတ်တိတ်နေရန် အမိန့်ပေးထားဆဲ ဖြစ်ပါသည်
         env:
-          CI: true
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-        run: yes | flet build apk --verbose --project teacher_match --product "Teacher Match" --org com.agency.teachermatch
+          PIP_QUIET: "1"
+        run: flet build apk --project teacher_match --product "Teacher Match" --org com.agency.teachermatch
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
