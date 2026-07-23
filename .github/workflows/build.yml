@@ -25,6 +25,11 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
       - name: Install Libraries
         run: pip install -r requirements.txt
 
