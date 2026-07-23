@@ -8,21 +8,9 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
-      # ၁။ စက်ပေါ်ရှိ မလိုအပ်သော အရာများကို ဖျက်ထုတ်ပြီး နေရာလွတ် ရှင်းလင်းခြင်း (Memory & Disk ရှင်းလင်းရန်)
-      - name: Free Disk Space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          android: false # Android SDK ကိုတော့ App ထုတ်ရန် လိုအပ်သဖြင့် မဖျက်ပါ
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: true
-
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
@@ -43,22 +31,19 @@ jobs:
           channel: 'stable'
           flutter-version: '3.16.9'
 
-      - name: Accept Android Licenses
+      - name: Install Dependencies
         run: |
-          flutter config --no-analytics
-          yes | flutter doctor --android-licenses || true
-
-      - name: Install Libraries
-        run: pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Build APK
-        # PIP ကို တိတ်တိတ်နေရန် အမိန့်ပေးထားဆဲ ဖြစ်ပါသည်
         env:
-          PIP_QUIET: "1"
+          CI: true
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false"
         run: flet build apk --project teacher_match --product "Teacher Match" --org com.agency.teachermatch
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: my-app-apk
+          name: teacher-match-apk
           path: build/apk/**/*.apk
