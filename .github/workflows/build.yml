@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-    # Hang ဖြစ်ခြင်းကို ကာကွယ်ရန် Ubuntu 22.04 ကို အတိအကျ အသုံးပြုထားပါသည်
     runs-on: ubuntu-22.04
 
     steps:
@@ -41,7 +40,11 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Build APK
-        run: flet build apk --project teacher_match --product "Teacher Match" --org com.agency.teachermatch
+        # CI=true နှင့် Gradle Daemon ကို ပိတ်ခြင်းဖြင့် Hang ဖြစ်ခြင်းကို တားဆီးပါမည်
+        env:
+          CI: true
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+        run: yes | flet build apk --verbose --project teacher_match --product "Teacher Match" --org com.agency.teachermatch
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
