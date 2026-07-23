@@ -29,8 +29,8 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Build APK
-        run: echo "y" | flet build apk --project teacher_match --product "Teacher Match" --org com.agency.teachermatch
-
+        run: echo "y" | flet build apk --project teacher_match --product "Teacher Match" --org com.agency.teachermatch --include-packages flet_file_picker
+        
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
