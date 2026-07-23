@@ -8,20 +8,39 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    # ဤနေရာတွင် Flet မှ တရားဝင်ထုတ်ပေးထားသော အသင့်သုံးစနစ် (Container) ကို အသုံးပြုထားပါသည်
-    container:
-      image: ghcr.io/flet-dev/flet-build:main
+    # Hang ဖြစ်ခြင်းကို ကာကွယ်ရန် Ubuntu 22.04 ကို အတိအကျ အသုံးပြုထားပါသည်
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.16.9'
+
+      - name: Accept Android Licenses
+        run: |
+          flutter config --no-analytics
+          yes | flutter doctor --android-licenses || true
+
       - name: Install Libraries
-        run: pip install -r requirements.txt --break-system-packages || pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
       - name: Build APK
-        # Container ထဲတွင် အားလုံး အသင့်ရှိနေပြီဖြစ်၍ ရိုးရှင်းစွာ Run ရုံသာ ဖြစ်ပါသည်
         run: flet build apk --project teacher_match --product "Teacher Match" --org com.agency.teachermatch
 
       - name: Upload APK Artifact
